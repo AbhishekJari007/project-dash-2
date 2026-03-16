@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Dash Pro</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  </head>
+  <body>
+    <div id="loginScreen" class="screen active">
+      <div class="glass card login-card">
+        <h1>Project Dash Pro</h1>
+        <p class="muted">Secure login to continue</p>
+        <label>Username
+          <input id="username" type="text" placeholder="admin" />
+        </label>
+        <label>Password
+          <input id="password" type="password" placeholder="••••••" />
+        </label>
+        <button id="loginBtn" class="primary">Login</button>
+        <p id="loginError" class="error"></p>
+      </div>
+    </div>
+
+    <div id="appScreen" class="screen">
+      <header class="topbar glass">
+        <div>
+          <h2>Project Dashboard</h2>
+          <p id="welcomeLine" class="muted"></p>
+        </div>
+        <div class="actions">
+          <button id="newProjectBtn" class="primary">+ New Project</button>
+          <button id="logoutBtn">Logout</button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="dashboard grid-card glass">
+          <h3>Overview</h3>
+          <div id="statusCards" class="status-cards"></div>
+          <canvas id="statusChart" height="120"></canvas>
+          <canvas id="financeChart" height="120"></canvas>
+        </section>
+
+        <section class="projects grid-card glass">
+          <h3>Projects</h3>
+          <input id="projectSearch" type="search" placeholder="Search projects..." />
+          <div id="projectList" class="list"></div>
+        </section>
+
+        <section class="project-details grid-card glass">
+          <h3>Project Details</h3>
+          <div id="projectContainer" class="empty">Select or create a project.</div>
+        </section>
+      </main>
+
+      <footer class="footer glass">Developed by Abhishek Jariwala</footer>
+    </div>
+
+    <template id="projectTemplate">
+      <div class="project-form">
+        <div class="two-col">
+          <label>Project Name<input data-field="projectName" /></label>
+          <label>Billing Name<input data-field="billingName" /></label>
+          <label>Client Name<input data-field="clientName" /></label>
+          <label>Address<input data-field="address" /></label>
+          <label>Contact Person<input data-field="contactPerson" /></label>
+          <label>Mobile Number<input data-field="mobile" /></label>
+          <label>GST Number<input data-field="gst" /></label>
+          <label>Project Start Date<input type="date" data-field="startDate" /></label>
+          <label>Project Deadline<input type="date" data-field="deadline" /></label>
+          <label>Total Project Value<input type="number" data-field="totalValue" /></label>
+          <label>Payment Received<input type="number" data-field="paymentReceived" /></label>
+          <label>Cash Payment Received<input type="number" data-field="cashReceived" /></label>
+          <label>Pending Amount<input type="number" data-field="pendingAmount" /></label>
+          <label>Status
+            <select data-field="status">
+              <option>Active</option><option>Completed</option><option>Running</option><option>Progress</option><option>On Hold</option>
+            </select>
+          </label>
+          <label>Engineer Name<input data-field="engineerName" /></label>
+          <label>Engineer Team Members<input data-field="engineerTeam" /></label>
+          <label>Contractor Name<input data-field="contractorName" /></label>
+          <label>Contractor Team / Labour<input data-field="contractorTeam" /></label>
+        </div>
+
+        <h4>Financials</h4>
+        <div class="two-col">
+          <label>COGS<input type="number" data-field="cogs" /></label>
+          <label>Operational Cost<input type="number" data-field="operationalCost" /></label>
+          <label>Other Expenses<input type="number" data-field="otherExpenses" /></label>
+          <label>Gross Profit<input data-field="grossProfit" disabled /></label>
+          <label>EBITDA<input data-field="ebitda" disabled /></label>
+          <label>Net Profit<input data-field="netProfit" disabled /></label>
+          <label>General Remarks<textarea data-field="generalRemarks"></textarea></label>
+          <label>Upload GST/Other Docs<input data-field="projectDocs" type="file" multiple /></label>
+        </div>
+
+        <h4>Phases (max 200)</h4>
+        <div class="inline">
+          <button data-action="addPhase">+ Add Phase</button>
+          <span id="phaseCount"></span>
+        </div>
+        <div id="phaseTableWrap"></div>
+
+        <h4>Payments</h4>
+        <div class="inline"><button data-action="addPayment">+ Add Payment Entry</button></div>
+        <div id="paymentTableWrap"></div>
+
+        <h4>Expenses</h4>
+        <div class="inline"><button data-action="addExpense">+ Add Expense</button></div>
+        <div id="expenseTableWrap"></div>
+
+        <h4>Billing Status</h4>
+        <div class="two-col">
+          <label>Billing Completion (%)<input type="number" min="0" max="100" data-field="billingCompletion" /></label>
+          <label>Billing Ratio<input data-field="billingRatio" disabled /></label>
+        </div>
+
+        <h4>Project Actions</h4>
+        <div class="inline">
+          <button data-action="save" class="primary">Save</button>
+          <button data-action="delete" class="danger">Delete</button>
+          <button data-action="pdf">Download PDF</button>
+        </div>
+
+        <h4>QR Sharing</h4>
+        <div class="inline">
+          <label><input type="checkbox" data-qr="details" checked /> Show Details</label>
+          <label><input type="checkbox" data-qr="financial" checked /> Show Financials</label>
+          <label><input type="checkbox" data-qr="pdf" /> Show PDF Link</label>
+        </div>
+        <canvas id="qrCanvas"></canvas>
+
+        <h4>WhatsApp</h4>
+        <div class="inline">
+          <textarea id="waMessage" placeholder="Type message for engineer/client..."></textarea>
+          <button data-action="whatsapp">Open WhatsApp</button>
+        </div>
+
+        <h4>Project Progress & Financial Graph</h4>
+        <canvas id="projectProgressChart" height="120"></canvas>
+      </div>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
